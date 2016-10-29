@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import authenticate, get_user_model
 from django.core.validators import RegexValidator
+from django.db.models import Q
 
 from .models import USERNAME_REGEX
 
@@ -12,26 +13,25 @@ User = get_user_model()
 
 
 class UserLoginForm(forms.Form):
-    username = forms.CharField(label='Username', validators=[RegexValidator(
-                        regex = USERNAME_REGEX,
-                        message = 'Username must be Alpahnumeric or contain any of the following: ". @ + -" ',
-                        code='invalid_username'
-                    )])
+    query = forms.CharField(label='Username / Email')
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
     def clean(self, *args, **kwargs):
-        username = self.cleaned_data.get("username")
+        query = self.cleaned_data.get("query")
         password = self.cleaned_data.get("password")
-        # the_user = authenticate(username=username, password=password)
-        # if not the_user:
-        #     raise forms.ValidationError("Invalid credentials")
-        user_obj = User.objects.filter(username=username).first()
-        if not user_obj:
-            raise forms.ValidationError("Invalid credentials")
-        else:
-            if not user_obj.check_password(password):
+        #user_qs1 = User.objects.filter(username__iexact=query)
+        #user_qs2 = User.objects.filter(email__iexact=query)
+        #user_qs_final = (user_qs1 | user_qs2).distinct()
+        user_qs_final = User.objects.filter(
+                Q(username__iexact=query)|
+                Q(email__iexact=query)
+            ).distinct()
+        if not user_qs_final.exists() and user_qs_final.count() != 1:
+            raise forms.ValidationError("Invalid credentials -- user not exist")
+        user_obj = user_qs_final.first()
+        if not user_obj.check_password(password):
                 # log auth tries
-                raise forms.ValidationError("Invalid credentials")
+                raise forms.ValidationError("Invalid credentials -- passowrd invalid")
         return super(UserLoginForm, self).clean(*args, **kwargs)
 
     # def clean_username(self):

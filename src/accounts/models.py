@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 # Create your models here.
 
 
-
+USERNAME_REGEX = '^[a-zA-Z0-9.+-]*$'
 
 class MyUserManager(BaseUserManager):
     def create_user(self, username, email, password=None):
@@ -45,7 +45,7 @@ class MyUserManager(BaseUserManager):
 
 
 
-USERNAME_REGEX = '^[a-zA-Z0-9.@+-]*$'
+
 
 
 class MyUser(AbstractBaseUser):
