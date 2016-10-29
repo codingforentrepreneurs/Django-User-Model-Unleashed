@@ -105,22 +105,22 @@ class MyUser(AbstractBaseUser):
 
 
 
-# class Profile(models.Model):
-#     user = models.OneToOneField(settings.AUTH_USER_MODEL)
-#     city = models.CharField(max_length=120, null=True, blank=True)
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    city = models.CharField(max_length=120, null=True, blank=True)
 
-#     def __str__(self):
-#         return str(self.user.username)
+    def __str__(self):
+        return str(self.user.username)
 
-#     def __unicode__(self):
-#         return str(self.user.username)
+    def __unicode__(self):
+        return str(self.user.username)
 
 
-# def post_save_user_model_receiver(sender, instance, created, *args, **kwargs):
-#     if created:
-#         try:
-#             Profile.objects.create(user=instance)
-#         except:
-#             pass
+def post_save_user_model_receiver(sender, instance, created, *args, **kwargs):
+    if created:
+        try:
+            Profile.objects.create(user=instance)
+        except:
+            pass
 
-# post_save.connect(post_save_user_model_receiver, sender=settings.AUTH_USER_MODEL)
+post_save.connect(post_save_user_model_receiver, sender=settings.AUTH_USER_MODEL)
