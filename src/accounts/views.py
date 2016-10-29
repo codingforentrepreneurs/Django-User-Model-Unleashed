@@ -1,4 +1,4 @@
-from django.contrib.auth import login, get_user_model
+from django.contrib.auth import login, get_user_model, logout
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -23,7 +23,7 @@ def register(request, *args, **kwargs):
     return render(request, "accounts/register.html", {"form": form})
 
 
-def user_login(request, *args, **kwargs):
+def login_view(request, *args, **kwargs):
     form = UserLoginForm(request.POST or None)
     if form.is_valid():
         username_ = form.cleaned_data.get('username')
@@ -31,3 +31,9 @@ def user_login(request, *args, **kwargs):
         login(request, user_obj)
         return HttpResponseRedirect("/")
     return render(request, "accounts/login.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect("/login")
+
