@@ -26,8 +26,7 @@ def register(request, *args, **kwargs):
 def login_view(request, *args, **kwargs):
     form = UserLoginForm(request.POST or None)
     if form.is_valid():
-        username_ = form.cleaned_data.get('username')
-        user_obj = User.objects.get(username__iexact=username_)
+        user_obj = form.cleaned_data.get('user_obj')
         login(request, user_obj)
         return HttpResponseRedirect("/")
     return render(request, "accounts/login.html", {"form": form})
